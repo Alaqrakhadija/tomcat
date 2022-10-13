@@ -1,5 +1,10 @@
 // To save as "<TOMCAT_HOME>\webapps\hello\WEB-INF\classes\HelloServlet.java"
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import jakarta.servlet.*;             // Tomcat 10
 import jakarta.servlet.http.*;        // Tomcat 10
 import jakarta.servlet.annotation.*;  // Tomcat 10
@@ -19,12 +24,38 @@ public class HelloServlet extends HttpServlet {
         response.setContentType("text/html");
         // Allocate a output writer to write the response message into the network socket
         PrintWriter out = response.getWriter();
+        String url = "jdbc:mysql://localhost:3306/test";
+        String user = "root";
+        String password = "123456789";
+        Connection connection = null;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+           connection = DriverManager.getConnection(url, user, password);
+            System.out.println("Connection is Successful to the database" + url);
+            String query = "Insert into student(idstudent,name) values(101,'ram')";
+            Statement statement = connection.createStatement();
+            statement.execute(query);
 
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        finally {
+            if(connection!=null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         // Write the response message, in an HTML page
         out.println("<!DOCTYPE html>");
         out.println("<html>");
         out.println("<head><title>Hello, World</title></head>");
-      
+
         out.println("<body>");
         out.println("<h1>Hello, world!</h1>");  // says Hello
         out.println("<h1>Khadija is here babe</h1>");
